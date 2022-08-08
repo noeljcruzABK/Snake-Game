@@ -50,8 +50,6 @@ int main()
 		}
 		wsprintf(&screen[nScreenWidth + 5], L"SNAKE GAME               SCORE: %d", nScore);
 
-		// Draw Snake Body
-
 		// Display Frame
 		WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0, 0 }, &dwBytesWritten);
 	}
