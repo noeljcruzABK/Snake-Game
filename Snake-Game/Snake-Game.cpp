@@ -1,10 +1,9 @@
-// Snake-Game.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// Snake Game
 
 #include <iostream>
 #include <Windows.h>
 #include <list>
 #include <thread>
-#include <chrono>
 using namespace std;
 
 int nScreenWidth = 120;
@@ -19,11 +18,12 @@ struct sSnakeSegment
 int main()
 {
 	// CREATE SCREEN BUFFER
-	wchar_t *screen = new wchar_t[nScreenHeight * nScreenHeight];
+	wchar_t* screen = new wchar_t[nScreenWidth * nScreenHeight];
 	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	SetConsoleActiveScreenBuffer(hConsole);
 	DWORD dwBytesWritten = 0;
 
+	// NEW GAME READY STATE
 	while (1)
 	{
 		list<sSnakeSegment> snake{ {60,15}, {61,15}, {62,15}, {63,15}, {64,15}, {65, 15}, {66,15}, {67, 15}, {68,15}, {69,15} };
