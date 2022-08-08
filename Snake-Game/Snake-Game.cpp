@@ -18,7 +18,7 @@ struct sSnakeSegment
 int main()
 {
 	// Create Screen Buffer
-	wchar_t *screen = new wchar_t[nScreenHeight * nScreenHeight];
+	wchar_t* screen = new wchar_t[nScreenHeight * nScreenHeight];
 	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	SetConsoleActiveScreenBuffer(hConsole);
 	DWORD dwBytesWritten = 0;
@@ -33,12 +33,12 @@ int main()
 
 	while (1)
 	{
-		// Timing & Input
+		// TIMING & INPUT
 		this_thread::sleep_for(200ms);
-		
+
 		// Get Input
 		bKeyRight = (0x8000 & GetAsyncKeyState((unsigned char)('\x27'))) != 0;
-		bKeyLeft = (0x8000 & GetAsyncKeyState((unsigned char)('\x27'))) != 0;
+		bKeyLeft = (0x8000 & GetAsyncKeyState((unsigned char)('\x25'))) != 0;
 
 		if (bKeyRight && !bKeyRightOld)
 		{
@@ -55,9 +55,28 @@ int main()
 		bKeyRightOld = bKeyRight;
 		bKeyLeftOld = bKeyLeft;
 
-		// Game Logic
+		// GAME LOGIC
+		// Update Snake Position
+		switch (nSnakeDirection)
+		{
+		case 0: // up
+			snake.push_front({ snake.front().x, snake.front().y - 1 });
+			break;
+		case 1: // right
+			snake.push_front({ snake.front().x + 1, snake.front().y });
+			break;
+		case 2: // down
+			snake.push_front({ snake.front().x, snake.front().y + 1 });
+			break;
+		case 3: // left
+			snake.push_front({ snake.front().x - 1, snake.front().y });
+			break;
+		}
 
-		// Display to Player
+		// Chop off Snake's Tail
+		snake.pop_back();
+
+		// DISPLAY TO PLAYER
 		// Clear Screen
 		for (int i = 0; i < nScreenWidth * nScreenHeight; i++)
 		{
@@ -83,7 +102,7 @@ int main()
 
 		// Draw Food
 		screen[nFoodY * nScreenWidth + nFoodX] = L'%';
-		
+
 		// Display Frame
 		WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0, 0 }, &dwBytesWritten);
 	}
