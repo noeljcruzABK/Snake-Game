@@ -3,6 +3,7 @@
 #include <iostream>
 #include <Windows.h>
 #include <list>
+#include <thread>
 using namespace std;
 
 int nScreenWidth = 120;
@@ -17,7 +18,7 @@ struct sSnakeSegment
 int main()
 {
 	// Create Screen Buffer
-	wchar_t* screen = new wchar_t[nScreenHeight * nScreenHeight];
+	wchar_t *screen = new wchar_t[nScreenHeight * nScreenHeight];
 	HANDLE hConsole = CreateConsoleScreenBuffer(GENERIC_READ | GENERIC_WRITE, 0, NULL, CONSOLE_TEXTMODE_BUFFER, NULL);
 	SetConsoleActiveScreenBuffer(hConsole);
 	DWORD dwBytesWritten = 0;
@@ -26,12 +27,33 @@ int main()
 	int nFoodX = 30;
 	int nFoodY = 15;
 	int nScore = 0;
-	int nSakeDirection = 3;
+	int nSnakeDirection = 3;
 	bool bDead = false;
+	bool bKeyLeft = false, bKeyRight = false, bKeyLeftOld = false, bKeyRightOld = false;
 
 	while (1)
 	{
 		// Timing & Input
+		this_thread::sleep_for(200ms);
+		
+		// Get Input
+		bKeyRight = (0x8000 & GetAsyncKeyState((unsigned char)('\x27'))) != 0;
+		bKeyLeft = (0x8000 & GetAsyncKeyState((unsigned char)('\x27'))) != 0;
+
+		if (bKeyRight && !bKeyRightOld)
+		{
+			nSnakeDirection++;
+			if (nSnakeDirection == 4) nSnakeDirection = 0;
+		}
+
+		if (bKeyLeft && !bKeyLeftOld)
+		{
+			nSnakeDirection--;
+			if (nSnakeDirection == -1) nSnakeDirection = 3;
+		}
+
+		bKeyRightOld = bKeyRight;
+		bKeyLeftOld = bKeyLeft;
 
 		// Game Logic
 
@@ -51,7 +73,17 @@ int main()
 		wsprintf(&screen[nScreenWidth + 5], L"SNAKE GAME               SCORE: %d", nScore);
 
 		// Draw Snake Body
+		for (auto s : snake)
+		{
+			screen[s.y * nScreenWidth + s.x] = bDead ? L'+' : L'O';
+		}
 
+		// Draw Snake Head
+		screen[snake.front().y * nScreenWidth + snake.front().x] = bDead ? L'X' : L'@';
+
+		// Draw Food
+		screen[nFoodY * nScreenWidth + nFoodX] = L'%';
+		
 		// Display Frame
 		WriteConsoleOutputCharacter(hConsole, screen, nScreenWidth * nScreenHeight, { 0, 0 }, &dwBytesWritten);
 	}
